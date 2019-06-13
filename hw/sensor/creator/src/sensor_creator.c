@@ -89,6 +89,10 @@
 #include <lis2dw12/lis2dw12.h>
 #endif
 
+#if MYNEWT_VAL(LIS2DH12_OFB)
+#include <lis2dh12/lis2dh12.h>
+#endif
+
 #if MYNEWT_VAL(LIS2DS12_OFB)
 #include <lis2ds12/lis2ds12.h>
 #endif
@@ -180,6 +184,10 @@ static struct lps33thw lps33thw;
 
 #if MYNEWT_VAL(LIS2DW12_OFB)
 static struct lis2dw12 lis2dw12;
+#endif
+
+#if MYNEWT_VAL(LIS2DH12_OFB)
+static struct lis2dh12 lis2dh12;
 #endif
 
 #if MYNEWT_VAL(LIS2DS12_OFB)
@@ -454,6 +462,17 @@ static struct sensor_itf i2c_0_itf_lis2dw12 = {
     .si_ints = {
         { MYNEWT_VAL(LIS2DW12_INT1_PIN_HOST), MYNEWT_VAL(LIS2DW12_INT1_PIN_DEVICE),
           MYNEWT_VAL(LIS2DW12_INT1_CFG_ACTIVE)}}
+};
+#endif
+
+#if MYNEWT_VAL(I2C_0) && MYNEWT_VAL(LIS2DH12_OFB)
+static struct sensor_itf i2c_0_itf_lis2dh12 = {
+    .si_type = SENSOR_ITF_I2C,
+    .si_num  = 0,
+    .si_addr = 0x19,
+    .si_ints = {
+        { MYNEWT_VAL(LIS2DH12_INT1_PIN_HOST), MYNEWT_VAL(LIS2DH12_INT1_PIN_DEVICE),
+          MYNEWT_VAL(LIS2DH12_INT1_CFG_ACTIVE)}}
 };
 #endif
 
@@ -1111,6 +1130,40 @@ config_lis2dw12_sensor(void)
 #endif
 
 /**
+ * LIS2DH12 Sensor default configuration used by the creator package
+ *
+ * @return 0 on success, non-zero on failure
+ */
+#if MYNEWT_VAL(LIS2DH12_OFB)
+static int
+config_lis2dh12_sensor(void)
+{
+    int rc;
+    struct os_dev *dev;
+    struct lis2dh12_cfg cfg = {0};
+
+    os_time_delay(1000);
+
+    dev = (struct os_dev *) os_dev_open("lis2dh12_0", OS_TIMEOUT_NEVER, NULL);
+
+    assert(dev != NULL);
+
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.lc_s_mask = SENSOR_TYPE_ACCELEROMETER;
+    cfg.lc_rate = LIS2DH12_DATA_RATE_HN_1344HZ_L_5376HZ;
+    cfg.lc_fs = LIS2DH12_FS_2G;
+    cfg.lc_pull_up_disc = 1;
+
+    rc = lis2dh12_config((struct lis2dh12 *) dev, &cfg);
+
+    assert(rc == 0);
+
+    os_dev_close(dev);
+    return rc;
+}
+#endif
+
+/**
  * LIS2DS12 Sensor default configuration used by the creator package
  *
  * @return 0 on success, non-zero on failure
@@ -1624,6 +1677,17 @@ sensor_dev_create(void)
     assert(rc == 0);
 
     rc = config_lis2dw12_sensor();
+    assert(rc == 0);
+#endif
+
+#if MYNEWT_VAL(LIS2DH12_OFB)
+    rc = os_dev_create((struct os_dev *) &lis2dh12, "lis2dh12_0",
+      OS_DEV_INIT_PRIMARY, 0, lis2dh12_init, (void *)&i2c_0_itf_lis2dh12);
+    assert(rc == 0);
+
+    printf("Called lis2dh12\n");
+
+    rc = config_lis2dh12_sensor();
     assert(rc == 0);
 #endif
 
