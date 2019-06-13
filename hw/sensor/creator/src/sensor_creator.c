@@ -1685,8 +1685,6 @@ sensor_dev_create(void)
       OS_DEV_INIT_PRIMARY, 0, lis2dh12_init, (void *)&i2c_0_itf_lis2dh12);
     assert(rc == 0);
 
-    printf("Called lis2dh12\n");
-
     rc = config_lis2dh12_sensor();
     assert(rc == 0);
 #endif
