@@ -1142,8 +1142,6 @@ config_lis2dh12_sensor(void)
     struct os_dev *dev;
     struct lis2dh12_cfg cfg = {0};
 
-    os_time_delay(1000);
-
     dev = (struct os_dev *) os_dev_open("lis2dh12_0", OS_TIMEOUT_NEVER, NULL);
 
     assert(dev != NULL);
