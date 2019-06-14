@@ -1351,10 +1351,14 @@ lis2dh12_init(struct os_dev *dev, void *arg)
     if (rc) {
         return rc;
     }
-    rc = init_intpin(lis2dh12, 1, lis2dh12_int_irq_handler, sensor);
-    if (rc) {
-        return rc;
-    }
+/**
+*    For DW1001-dev only int1 is used. int2 is not defined and not wired
+*    TODO : Check for others boards
+*    rc = init_intpin(lis2dh12, 1, lis2dh12_int_irq_handler, sensor);
+*    if (rc) {
+*        return rc;
+*    }
+**/
     return 0;
 err:
     return rc;

@@ -59,7 +59,7 @@ syscfg.defs:
         value: 1
     LIS2DH12_INT1_CFG_ACTIVE:
         description: 'Set 0 for active-low, 1 for active-high'
-        value: 0
+        value: 1
     LIS2DH12_INT2_PIN_HOST:
         description: 'Interrupt pin number on host device connected to INT1 on device'
         value: 31
